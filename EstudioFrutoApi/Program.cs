@@ -1,6 +1,11 @@
-
+using EstudioFrutoApi.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configuração do DbContext
+builder.Services.AddDbContext<AgendaContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 
