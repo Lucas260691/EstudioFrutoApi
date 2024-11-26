@@ -12,5 +12,7 @@ namespace EstudioFrutoApi.Data
         public DbSet<Instrutor> Instrutores { get; set; }
         public DbSet<Sala> Salas { get; set; }
         public DbSet<Horario> Horarios { get; set; }
+        public DbSet<DiaTrabalho> DiasTrabalho { get; set; }
+        public DbSet<AulaExperimental> AulasExperimentais { get; set; }
     }
 }

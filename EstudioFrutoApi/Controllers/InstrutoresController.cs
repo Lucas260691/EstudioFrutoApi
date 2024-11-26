@@ -16,16 +16,24 @@ namespace EstudioFrutoApi.Controllers
             _context = context;
         }
 
+        // GET: api/Instrutores
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Instrutor>>> GetInstrutores()
         {
-            return await _context.Instrutores.ToListAsync();
+            // Retorna todos os instrutores com os dias de trabalho associados
+            return await _context.Instrutores
+                .Include(i => i.DiasTrabalho)
+                .ToListAsync();
         }
 
+        // GET: api/Instrutores/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Instrutor>> GetInstrutor(int id)
         {
-            var instrutor = await _context.Instrutores.FindAsync(id);
+            // Busca um instrutor específico pelo ID, incluindo os dias de trabalho
+            var instrutor = await _context.Instrutores
+                .Include(i => i.DiasTrabalho)
+                .FirstOrDefaultAsync(i => i.InstrutorID == id);
 
             if (instrutor == null)
             {
@@ -39,6 +47,7 @@ namespace EstudioFrutoApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Instrutor>> PostInstrutor(Instrutor instrutor)
         {
+            // Adiciona um novo instrutor
             _context.Instrutores.Add(instrutor);
             await _context.SaveChangesAsync();
 
@@ -54,6 +63,7 @@ namespace EstudioFrutoApi.Controllers
                 return BadRequest();
             }
 
+            // Atualiza os dados do instrutor
             _context.Entry(instrutor).State = EntityState.Modified;
 
             try
@@ -79,21 +89,28 @@ namespace EstudioFrutoApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteInstrutor(int id)
         {
+            // Busca o instrutor pelo ID
             var instrutor = await _context.Instrutores.FindAsync(id);
+
             if (instrutor == null)
             {
                 return NotFound();
             }
 
+            // Remove o instrutor e seus dias de trabalho
+            var diasTrabalho = _context.DiasTrabalho.Where(d => d.InstrutorID == id);
+            _context.DiasTrabalho.RemoveRange(diasTrabalho);
             _context.Instrutores.Remove(instrutor);
+
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
+        // Helper: Verifica se o instrutor existe
         private bool InstrutorExists(int id)
         {
             return _context.Instrutores.Any(e => e.InstrutorID == id);
         }
-    }
+    }  
 }
