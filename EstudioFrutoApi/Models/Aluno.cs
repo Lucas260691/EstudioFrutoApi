@@ -22,5 +22,6 @@ namespace EstudioFrutoApi.Models
         [Required]
         [MaxLength(50)] // Opcional, define o tamanho máximo do apelido
         public string CodAlune { get; set; }
+
     }
 }
