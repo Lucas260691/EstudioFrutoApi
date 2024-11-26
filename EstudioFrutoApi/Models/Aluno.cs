@@ -18,5 +18,9 @@ namespace EstudioFrutoApi.Models
 
         [Phone] // Validação de número de telefone
         public string Contato { get; set; }
+
+        [Required]
+        [MaxLength(50)] // Opcional, define o tamanho máximo do apelido
+        public string CodAlune { get; set; }
     }
 }
