@@ -17,16 +17,25 @@ namespace EstudioFrutoApi.Controllers
             _context = context;
         }
 
-        // GET: api/AulasExperimentais
         [HttpGet]
         public async Task<IActionResult> ListarAulasExperimentais()
         {
             var aulas = await _context.AulasExperimentais
-                .Include(a => a.Instrutor)
+                .Include(a => a.NomeInstrutor)
+                .Select(a => new
+                {
+                    a.AulaExperimentalID,
+                    Data = a.Data.ToString("dd/MM/yyyy"), // Formata a data
+                    Hora = a.Hora.ToString(@"hh\:mm"),   // Formata a hora
+                    a.NomeInstrutor,
+                    a.NivelAluno,
+                    a.Origem
+                })
                 .ToListAsync();
 
             return Ok(aulas);
         }
+
 
         // GET: api/AulasExperimentais/verificar-disponibilidade/{id}
         [HttpGet("verificar-disponibilidade/{id}")]
@@ -49,7 +58,6 @@ namespace EstudioFrutoApi.Controllers
             return Ok(disponibilidade);
         }
 
-        // POST: api/AulasExperimentais
         [HttpPost]
         public async Task<IActionResult> AgendarAulaExperimental(AulaExperimental aulaExperimental)
         {
@@ -63,19 +71,25 @@ namespace EstudioFrutoApi.Controllers
                 return BadRequest("Instrutor não encontrado. Verifique o nome informado.");
             }
 
-            // Verifica se o instrutor está disponível no horário
+            // Combina a data e hora para verificar disponibilidade
+            var dataHoraCompleta = aulaExperimental.Data.Add(aulaExperimental.Hora);
+
             var disponibilidadeService = new DisponibilidadeService(_context);
 
             var instrutorDisponivel = disponibilidadeService.VerificarDisponibilidadeInstrutor(
-                instrutor.InstrutorID, aulaExperimental.DataHora);
+                instrutor.InstrutorID, dataHoraCompleta);
 
             if (!instrutorDisponivel)
             {
                 return BadRequest("Instrutor indisponível para o horário selecionado.");
             }
 
+            // Associa os IDs e informações ao registro
             aulaExperimental.InstrutorID = instrutor.InstrutorID;
             aulaExperimental.NomeInstrutor = instrutor.Nome;
+
+            // O nível será definido posteriormente, pelo instrutor
+            aulaExperimental.NivelAluno = null;
 
             _context.AulasExperimentais.Add(aulaExperimental);
             await _context.SaveChangesAsync();
@@ -83,7 +97,25 @@ namespace EstudioFrutoApi.Controllers
             return Ok(aulaExperimental);
         }
 
-        // PUT: api/AulasExperimentais/{id}
+        [HttpPatch("{id}/definir-nivel")]
+        public async Task<IActionResult> DefinirNivel(int id, [FromBody] string nivel)
+        {
+            var aulaExperimental = await _context.AulasExperimentais.FindAsync(id);
+
+            if (aulaExperimental == null)
+            {
+                return NotFound("Aula experimental não encontrada.");
+            }
+
+            aulaExperimental.NivelAluno = nivel;
+
+            _context.Entry(aulaExperimental).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(aulaExperimental);
+        }
+
+
         [HttpPut("{id}")]
         public async Task<IActionResult> AtualizarAulaExperimental(int id, AulaExperimental aulaExperimental)
         {
@@ -99,6 +131,9 @@ namespace EstudioFrutoApi.Controllers
             {
                 return BadRequest("Instrutor não encontrado. Verifique o nome informado.");
             }
+
+            // Combina data e hora se necessário para validações
+            var dataHoraCompleta = aulaExperimental.Data.Add(aulaExperimental.Hora);
 
             aulaExperimental.InstrutorID = instrutor.InstrutorID;
 
@@ -122,6 +157,7 @@ namespace EstudioFrutoApi.Controllers
 
             return NoContent();
         }
+
 
         // DELETE: api/AulasExperimentais/{id}
         [HttpDelete("{id}")]

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace EstudioFrutoApi.Models
 {
@@ -8,21 +9,26 @@ namespace EstudioFrutoApi.Models
         public int AulaExperimentalID { get; set; }
 
         [Required]
-        public DateTime DataHora { get; set; }
+        public DateTime Data { get; set; } // Apenas a data da aula experimental
+
+        [Required]
+        [DataType(DataType.Time)]
+        public TimeSpan Hora { get; set; } // Apenas a hora da aula experimental
 
         [Required]
         public int InstrutorID { get; set; }
-        public Instrutor Instrutor { get; set; }
 
-        public string NomeInstrutor { get; set; } // Nome do instrutor (persistido)
+        public string NomeInstrutor { get; set; }
+
+        public string? NivelAluno { get; set; } // O nível será definido após a aula experimental
+
+        public string DisponibilidadeAluno { get; set; }
+
+        public string DiasSemanaPreferencia { get; set; }
+
+        public bool FechouMatricula { get; set; }
 
         [Required]
-        public string NivelAluno { get; set; } // Básico, Intermediário, Avançado
-
-        public string DisponibilidadeAluno { get; set; } // Ex.: "08:00-10:00"
-
-        public string DiasSemanaPreferencia { get; set; } // Ex.: "Segunda-feira, Quarta-feira"
-
-        public bool FechouMatricula { get; set; } // Indica se o aluno decidiu se matricular
+        public string Origem { get; set; } // Indica como o aluno chegou
     }
 }
