@@ -12,16 +12,41 @@ namespace EstudioFrutoApi.Services
             _context = context;
         }
 
-        public bool VerificarDisponibilidade(int instrutorID, string diaSemana, string horario)
+        // Verifica se um instrutor está disponível para uma aula experimental
+        public bool VerificarDisponibilidadeInstrutor(int instrutorID, DateTime dataHora)
         {
-            var diaTrabalho = _context.DiasTrabalho
-                .FirstOrDefault(d => d.InstrutorID == instrutorID && d.DiaSemana == diaSemana);
+            var diaSemana = dataHora.DayOfWeek.ToString();
 
-            if (diaTrabalho == null) return false;
+            var instrutor = _context.Instrutores
+                .Include(i => i.DiasTrabalho)
+                .FirstOrDefault(i => i.InstrutorID == instrutorID);
 
-            return diaTrabalho.HorariosDisponiveis.Split(',')
-                .Any(h => h.Trim() == horario);
+            if (instrutor == null) return false;
+
+            return instrutor.DiasTrabalho.Any(d =>
+                d.DiaSemana == diaSemana &&
+                d.HorariosDisponiveis.Contains(dataHora.ToString("HH:mm")));
+        }
+
+        // Verifica a disponibilidade de horários com base no nível e preferências do aluno
+        public async Task<string> VerificarDisponibilidadePorNivel(string nivel, string diasPreferencia, string horarioPreferencia)
+        {
+            var dias = diasPreferencia.Split(',').Select(d => d.Trim()).ToList();
+
+            var disponibilidade = await _context.DiasTrabalho
+                .Where(d => dias.Contains(d.DiaSemana) &&
+                            d.HorariosDisponiveis.Contains(horarioPreferencia))
+                .Include(d => d.Instrutor)
+                .ToListAsync();
+
+            var resultado = disponibilidade
+                .Where(d => d.Instrutor.Nome.Contains(nivel, StringComparison.OrdinalIgnoreCase))
+                .Select(d => $"{d.DiaSemana}, {horarioPreferencia} com {d.NomeInstrutor}")
+                .FirstOrDefault();
+
+            return resultado ?? "Nenhuma disponibilidade encontrada para o horário e nível informados.";
         }
     }
+
 
 }
