@@ -20,13 +20,15 @@ namespace EstudioFrutoApi.Models
 
         public string NomeInstrutor { get; set; }
 
+        public string NomeAluno { get; set; }
+
+        public string Contato  { get; set; }
+
         public string? NivelAluno { get; set; } // O nível será definido após a aula experimental
 
-        public string DisponibilidadeAluno { get; set; }
+        public bool FechouContrato { get; set; } // Indicador se o contrato foi fechado
 
-        public string DiasSemanaPreferencia { get; set; }
-
-        public bool FechouMatricula { get; set; }
+        public string? MotivoNaoFechamento { get; set; } // Motivo do não fechamento
 
         [Required]
         public string Origem { get; set; } // Indica como o aluno chegou
