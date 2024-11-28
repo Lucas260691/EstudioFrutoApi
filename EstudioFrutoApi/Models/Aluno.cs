@@ -23,5 +23,13 @@ namespace EstudioFrutoApi.Models
         [MaxLength(50)] // Opcional, define o tamanho máximo do apelido
         public string CodAlune { get; set; }
 
+        [Required]
+        public string TipoPlano { get; set; } // Plano: Mês teste, semestral, trimestral
+
+        [Required]
+        public string FrequenciaSemanal { get; set; } // Frequência: 1x, 2x, 3x, 4x
+
+        public string DiasFixos { get; set; } // Dias fixos do aluno
+
     }
 }
