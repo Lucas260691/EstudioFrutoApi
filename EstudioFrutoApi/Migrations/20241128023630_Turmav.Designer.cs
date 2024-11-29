@@ -4,6 +4,7 @@ using EstudioFrutoApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EstudioFrutoApi.Migrations
 {
     [DbContext(typeof(AgendaContext))]
-    partial class AgendaContextModelSnapshot : ModelSnapshot
+    [Migration("20241128023630_Turmav")]
+    partial class Turmav
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,12 +66,7 @@ namespace EstudioFrutoApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TurmaID")
-                        .HasColumnType("int");
-
                     b.HasKey("AlunoID");
-
-                    b.HasIndex("TurmaID");
 
                     b.ToTable("Alunos");
                 });
@@ -230,55 +228,6 @@ namespace EstudioFrutoApi.Migrations
                     b.ToTable("Salas");
                 });
 
-            modelBuilder.Entity("EstudioFrutoApi.Models.Turma", b =>
-                {
-                    b.Property<int>("TurmaID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TurmaID"));
-
-                    b.Property<string>("DiasSemana")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<TimeSpan>("HoraFim")
-                        .HasColumnType("time");
-
-                    b.Property<TimeSpan>("HoraInicio")
-                        .HasColumnType("time");
-
-                    b.Property<int>("InstrutorID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nivel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NomeInstrutor")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Sala")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("TurmaID");
-
-                    b.ToTable("Turmas");
-                });
-
-            modelBuilder.Entity("EstudioFrutoApi.Models.Aluno", b =>
-                {
-                    b.HasOne("EstudioFrutoApi.Models.Turma", null)
-                        .WithMany("Alunos")
-                        .HasForeignKey("TurmaID");
-                });
-
             modelBuilder.Entity("EstudioFrutoApi.Models.DiaTrabalho", b =>
                 {
                     b.HasOne("EstudioFrutoApi.Models.Instrutor", "Instrutor")
@@ -320,11 +269,6 @@ namespace EstudioFrutoApi.Migrations
             modelBuilder.Entity("EstudioFrutoApi.Models.Instrutor", b =>
                 {
                     b.Navigation("DiasTrabalho");
-                });
-
-            modelBuilder.Entity("EstudioFrutoApi.Models.Turma", b =>
-                {
-                    b.Navigation("Alunos");
                 });
 #pragma warning restore 612, 618
         }
