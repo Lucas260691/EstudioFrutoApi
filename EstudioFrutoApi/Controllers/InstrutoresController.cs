@@ -1,7 +1,9 @@
 ﻿using EstudioFrutoApi.Data;
 using EstudioFrutoApi.Models;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using LoginRequest = EstudioFrutoApi.Models.LoginRequest;
 
 namespace EstudioFrutoApi.Controllers
 {
@@ -16,11 +18,64 @@ namespace EstudioFrutoApi.Controllers
             _context = context;
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var instrutor = await _context.Instrutores
+                .FirstOrDefaultAsync(i => i.Email == request.Email);
+
+            if (instrutor == null)
+            {
+                return Unauthorized("Email não encontrado.");
+            }
+
+            // Validação de senha (usar uma senha padrão se ainda não implementada)
+            if (request.Senha != "senhaPadrao")
+            {
+                return Unauthorized("Senha incorreta.");
+            }
+
+            // Retorna o instrutor e dados necessários
+            return Ok(new
+            {
+                mensagem = "Login bem-sucedido",
+                instrutorID = instrutor.InstrutorID,
+                nome = instrutor.Nome,
+                email = instrutor.Email
+            });
+        }
+
+
+        // PUT: api/Instrutores/AlterarSenha/5
+        [HttpPut("AlterarSenha/{id}")]
+        public async Task<IActionResult> AlterarSenha(int id, [FromBody] AlterarSenhaRequest request)
+        {
+            var instrutor = await _context.Instrutores.FindAsync(id);
+
+            if (instrutor == null)
+            {
+                return NotFound("Instrutor não encontrado.");
+            }
+
+            // Validação da senha antiga (se necessário)
+            if (request.SenhaAntiga != "senhaPadrao")
+            {
+                return Unauthorized("Senha antiga incorreta.");
+            }
+
+            // Atualiza a senha para a nova
+            instrutor.Senha = request.NovaSenha; // Se o campo Senha não existir, adicione-o ao modelo
+            await _context.SaveChangesAsync();
+
+            return Ok("Senha alterada com sucesso.");
+        }
+
+
         // GET: api/Instrutores
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Instrutor>>> GetInstrutores()
         {
-            // Retorna todos os instrutores com os dias de trabalho associados
+            // Retorna todos os instrutores
             return await _context.Instrutores
                 .Include(i => i.DiasTrabalho)
                 .ToListAsync();
@@ -30,9 +85,8 @@ namespace EstudioFrutoApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Instrutor>> GetInstrutor(int id)
         {
-            // Busca um instrutor específico pelo ID, incluindo os dias de trabalho
+            // Busca um instrutor específico pelo ID
             var instrutor = await _context.Instrutores
-                .Include(i => i.DiasTrabalho)
                 .FirstOrDefaultAsync(i => i.InstrutorID == id);
 
             if (instrutor == null)
@@ -44,10 +98,17 @@ namespace EstudioFrutoApi.Controllers
         }
 
         // POST: api/Instrutores
-        [HttpPost]
+        [HttpPost("cadastrar")]
         public async Task<ActionResult<Instrutor>> PostInstrutor(Instrutor instrutor)
         {
             // Adiciona um novo instrutor
+
+            if (_context.Instrutores.Any(i => i.Email == instrutor.Email))
+            {
+                return BadRequest("Já existe um instrutor com este email.");
+            }
+
+
             _context.Instrutores.Add(instrutor);
             await _context.SaveChangesAsync();
 
@@ -96,11 +157,6 @@ namespace EstudioFrutoApi.Controllers
             {
                 return NotFound();
             }
-
-            // Remove o instrutor e seus dias de trabalho
-            var diasTrabalho = _context.DiasTrabalho.Where(d => d.InstrutorID == id);
-            _context.DiasTrabalho.RemoveRange(diasTrabalho);
-            _context.Instrutores.Remove(instrutor);
 
             await _context.SaveChangesAsync();
 
