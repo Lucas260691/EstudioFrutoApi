@@ -10,14 +10,14 @@ namespace EstudioFrutoApi.Models
         [Required]
         public string Nome { get; set; }
 
-        [Required]
-        public string DisponibilidadeHoraria { get; set; }
-
         [EmailAddress] // Validação de email
         public string Email { get; set; }
 
         [Phone] // Validação de número de telefone
         public string Contato { get; set; }
+
+        [Required]
+        public string Senha { get; set; } // Novo campo
 
         public ICollection<DiaTrabalho> DiasTrabalho { get; set; } = new List<DiaTrabalho>();
 
