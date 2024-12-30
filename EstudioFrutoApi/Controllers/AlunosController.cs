@@ -1,6 +1,5 @@
 ﻿using EstudioFrutoApi.Data;
 using EstudioFrutoApi.Models;
-using EstudioFrutoApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -60,97 +59,90 @@ namespace EstudioFrutoApi.Controllers
         }
 
         // POST: api/Alunos/cadastrar-pos-aula/{aulaId}
-        [HttpPost("cadastrar-pos-aula/{aulaId}")]
-        public async Task<ActionResult<Aluno>> CadastrarPosAulaExperimental(int aulaId, [FromBody] DadosAluno dados)
-        {
+        //[HttpPost("cadastrar-pos-aula/{aulaId}")]
+        //public async Task<ActionResult<Aluno>> CadastrarPosAulaExperimental(int aulaId, [FromBody] DadosAluno dados)
+       // {
             // Busca a aula experimental
-            var aulaExperimental = await _context.AulasExperimentais.FindAsync(aulaId);
+           // var aulaExperimental = await _context.AulasExperimentais.FindAsync(aulaId);
 
-            if (aulaExperimental == null || !aulaExperimental.FechouContrato)
-            {
-                return BadRequest("Aula experimental não encontrada ou contrato não fechado.");
-            }
+            //if (aulaExperimental == null || !aulaExperimental.FechouContrato)
+            //{
+            //   // return BadRequest("Aula experimental não encontrada ou contrato não fechado.");
+           // }
 
             // Valida disponibilidade na agenda
-            var disponibilidadeService = new DisponibilidadeService(_context);
-            var horarioDisponivel = await disponibilidadeService.ValidarDisponibilidade(
-                dados.DiasFixos, dados.FrequenciaSemanal);
-
-            if (!horarioDisponivel.Sucesso)
-            {
-                return BadRequest(horarioDisponivel.Mensagem);
-            }
+           
 
             // Cria o aluno com base nos dados da aula experimental
-            var aluno = new Aluno
-            {
-                Nome = aulaExperimental.NomeAluno,
-                Contato = aulaExperimental.Contato,
-                Email = dados.Email,
-                Nivel = aulaExperimental.NivelAluno,
-                TipoPlano = dados.TipoPlano,
-                FrequenciaSemanal = dados.FrequenciaSemanal,
-                DiasFixos = string.Join(", ", horarioDisponivel.DiasConfirmados), // Corrigido
-                CodAlune = dados.CodAlune
-            };
+            //var aluno = new Aluno
+            //{
+                //Nome = aulaExperimental.NomeAluno,
+                //Contato = aulaExperimental.Contato,
+                //Email = dados.Email,
+                //Nivel = aulaExperimental.NivelAluno,
+                //TipoPlano = dados.TipoPlano,
+                //FrequenciaSemanal = dados.FrequenciaSemanal,
+                //DiasFixos = string.Join(", ", horarioDisponivel.DiasConfirmados), // Corrigido
+                //CodAlune = dados.CodAlune
+           // };
 
-            _context.Alunos.Add(aluno);
-            await _context.SaveChangesAsync();
+            //_context.Alunos.Add(aluno);
+            //await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetAluno), new { id = aluno.AlunoID }, aluno);
+            //return CreatedAtAction(nameof(GetAluno), new { id = aluno.AlunoID }, aluno);
         }
 
         // PUT: api/Alunos/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAluno(int id, Aluno aluno)
-        {
-            if (id != aluno.AlunoID)
-            {
-                return BadRequest();
-            }
+       // [HttpPut("{id}")]
+       // public async Task<IActionResult> PutAluno(int id, Aluno aluno)
+        //{
+           // if (id != aluno.AlunoID)
+            //{
+             //   return BadRequest();
+           // }
 
-            _context.Entry(aluno).State = EntityState.Modified;
+           // _context.Entry(aluno).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AlunoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
+            //try
+            //{
+            //   // await _context.SaveChangesAsync();
+           // }
+           // catch (DbUpdateConcurrencyException)
+           // {
+              //  if (!AlunoExists(id))
+                //{
+              //      return NotFound();
+               // }
+               // else
+               // {
+                   // throw;
+           //    // }
+           // }
+           //
+            //return NoContent();
+       // }
 
         // DELETE: api/Alunos/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAluno(int id)
-        {
-            var aluno = await _context.Alunos.FindAsync(id);
-            if (aluno == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteAluno(int id)
+        //{
+            //var aluno = await _context.Alunos.FindAsync(id);
+            //if (aluno == null)
+            //{
+              //  return NotFound();
+           // }
 
-            _context.Alunos.Remove(aluno);
-            await _context.SaveChangesAsync();
+           // _context.Alunos.Remove(aluno);
+           // await _context.SaveChangesAsync();
 
-            return NoContent();
-        }
+           // return NoContent();
+       // }
 
-        private bool AlunoExists(int id)
-        {
-            return _context.Alunos.Any(e => e.AlunoID == id);
-        }
-    }
+       // private bool AlunoExists(int id)
+       // {
+           // return _context.Alunos.Any(e => e.AlunoID == id);
+       // }
+    //}
 
     // Classe auxiliar para os dados complementares no cadastro pós aula experimental
     public class DadosAluno
