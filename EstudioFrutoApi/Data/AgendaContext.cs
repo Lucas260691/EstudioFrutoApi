@@ -15,5 +15,14 @@ namespace EstudioFrutoApi.Data
         public DbSet<DiaTrabalho> DiasTrabalho { get; set; }
         public DbSet<AulaExperimental> AulasExperimentais { get; set; }
         public DbSet<Turma> Turmas {  get; set; }
+        public DbSet<Login> Logins { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Login>()
+                .HasOne(l => l.Instrutor)
+                .WithOne(i => i.Login)
+                .HasForeignKey<Login>(l => l.InstrutorID);
+        }
     }
 }

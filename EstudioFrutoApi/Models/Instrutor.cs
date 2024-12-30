@@ -16,11 +16,7 @@ namespace EstudioFrutoApi.Models
         [Phone] // Validação de número de telefone
         public string Contato { get; set; }
 
-        [Required]
-        public string Senha { get; set; } // Novo campo
+        public Login Login { get; set; }
 
-        public ICollection<DiaTrabalho> DiasTrabalho { get; set; } = new List<DiaTrabalho>();
-
-        
     }
 }

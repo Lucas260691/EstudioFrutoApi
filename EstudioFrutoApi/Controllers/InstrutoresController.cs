@@ -18,66 +18,12 @@ namespace EstudioFrutoApi.Controllers
             _context = context;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            var instrutor = await _context.Instrutores
-                .FirstOrDefaultAsync(i => i.Email == request.Email);
-
-            if (instrutor == null)
-            {
-                return Unauthorized("Email não encontrado.");
-            }
-
-            // Validação de senha (usar uma senha padrão se ainda não implementada)
-            if (request.Senha != "senhaPadrao")
-            {
-                return Unauthorized("Senha incorreta.");
-            }
-
-            // Retorna o instrutor e dados necessários
-            return Ok(new
-            {
-                mensagem = "Login bem-sucedido",
-                instrutorID = instrutor.InstrutorID,
-                nome = instrutor.Nome,
-                email = instrutor.Email
-            });
-        }
-
-
-        // PUT: api/Instrutores/AlterarSenha/5
-        [HttpPut("AlterarSenha/{id}")]
-        public async Task<IActionResult> AlterarSenha(int id, [FromBody] AlterarSenhaRequest request)
-        {
-            var instrutor = await _context.Instrutores.FindAsync(id);
-
-            if (instrutor == null)
-            {
-                return NotFound("Instrutor não encontrado.");
-            }
-
-            // Validação da senha antiga (se necessário)
-            if (request.SenhaAntiga != "senhaPadrao")
-            {
-                return Unauthorized("Senha antiga incorreta.");
-            }
-
-            // Atualiza a senha para a nova
-            instrutor.Senha = request.NovaSenha; // Se o campo Senha não existir, adicione-o ao modelo
-            await _context.SaveChangesAsync();
-
-            return Ok("Senha alterada com sucesso.");
-        }
-
-
         // GET: api/Instrutores
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Instrutor>>> GetInstrutores()
         {
             // Retorna todos os instrutores
             return await _context.Instrutores
-                .Include(i => i.DiasTrabalho)
                 .ToListAsync();
         }
 
@@ -97,24 +43,27 @@ namespace EstudioFrutoApi.Controllers
             return instrutor;
         }
 
-        // POST: api/Instrutores
         [HttpPost("cadastrar")]
         public async Task<ActionResult<Instrutor>> PostInstrutor(Instrutor instrutor)
         {
-            // Adiciona um novo instrutor
-
-            if (_context.Instrutores.Any(i => i.Email == instrutor.Email))
+            if (_context.Logins.Any(l => l.Email == instrutor.Email))
             {
-                return BadRequest("Já existe um instrutor com este email.");
+                return BadRequest("Já existe um login com este email.");
             }
 
+            var login = new Login
+            {
+                Email = instrutor.Email,
+                Senha = "senhaPadrao" // Substitua por hash em implementações futuras
+            };
+
+            instrutor.Login = login;
 
             _context.Instrutores.Add(instrutor);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetInstrutor), new { id = instrutor.InstrutorID }, instrutor);
         }
-
         // PUT: api/Instrutores/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutInstrutor(int id, Instrutor instrutor)
