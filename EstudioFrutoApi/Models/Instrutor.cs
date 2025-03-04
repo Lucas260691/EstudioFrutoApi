@@ -16,7 +16,7 @@ namespace EstudioFrutoApi.Models
         [Phone] // Validação de número de telefone
         public string Contato { get; set; }
 
-        public Login Login { get; set; }
+        public Login? Login { get; set; }
 
     }
 }

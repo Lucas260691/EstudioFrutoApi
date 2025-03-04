@@ -51,15 +51,21 @@ namespace EstudioFrutoApi.Controllers
                 return BadRequest("Já existe um login com este email.");
             }
 
+            _context.Instrutores.Add(instrutor);
+            await _context.SaveChangesAsync();
+
             var login = new Login
             {
                 Email = instrutor.Email,
-                Senha = "senhaPadrao" // Substitua por hash em implementações futuras
+                Senha = "senhaPadrao", // Substitua por hash em implementações futuras,
+                InstrutorID = instrutor.InstrutorID
             };
 
-            instrutor.Login = login;
+            _context.Logins.Add(login);
+            await _context.SaveChangesAsync();
 
-            _context.Instrutores.Add(instrutor);
+            instrutor.Login = login;
+            _context.Instrutores.Update(instrutor);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetInstrutor), new { id = instrutor.InstrutorID }, instrutor);
